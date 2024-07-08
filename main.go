@@ -306,7 +306,6 @@ func insertAllNew[T Comparable[T]](vs []T, initialIndices [][]int, cd int) *kdNo
 
 func midValue[T Comparable[T]](vs []T, cutIndex []int) (T, int) {
 	i := (len(cutIndex) - 1) / 2
-	fmt.Printf("DBG: len(cutIndex): %d", len(cutIndex))
 	mvi := cutIndex[i]
 	return vs[mvi], mvi
 }

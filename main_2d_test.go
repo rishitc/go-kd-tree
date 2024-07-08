@@ -76,7 +76,6 @@ func Test2DNearestNeighbor1(t *testing.T) {
 		{8, 7},
 	}
 	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
-	fmt.Printf("The tree is:\n%s", tree)
 	testTable := []struct {
 		input, expected Tensor2D
 	}{
@@ -533,7 +532,7 @@ func Test2DDeleteNodeWithLeftSubtreeOnly(t *testing.T) {
 	}
 }
 
-func Test2DNodeDelete1(t *testing.T) {
+func Test2DDeleteNode1(t *testing.T) {
 	const dimensions = 2
 	ps := []Tensor2D{
 		{5, 6},
@@ -559,7 +558,7 @@ func Test2DNodeDelete1(t *testing.T) {
 		}
 	}
 }
-func Test2DNodeDelete2(t *testing.T) {
+func Test2DDeleteNode2(t *testing.T) {
 	treeNodes := kdtree.NewKDNode(Tensor2D{5, 6}).
 		SetLeft(
 			kdtree.NewKDNode(Tensor2D{4, 10}).
