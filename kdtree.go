@@ -11,38 +11,6 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-type Relation int
-
-const (
-	Lesser Relation = iota
-	Equal
-	Greater
-)
-
-var ErrTreeNotSetup = fmt.Errorf("tree is not setup, make sure you create the tree using NewTree")
-
-type Comparable[T any] interface {
-	fmt.Stringer
-	Order(rhs T, dim int) Relation
-	Dist(rhs T) int
-	DistDim(rhs T, dim int) int
-	Encode() []byte
-}
-
-type KDTree[T Comparable[T]] struct {
-	dimensions int
-	root       *kdNode[T]
-	isSetup    bool
-	zeroVal    T
-	sz         int
-}
-
-type kdNode[T Comparable[T]] struct {
-	value T
-	left  *kdNode[T]
-	right *kdNode[T]
-}
-
 func NewKDNode[T Comparable[T]](value T) *kdNode[T] {
 	return &kdNode[T]{
 		value: value,
@@ -59,7 +27,6 @@ func NewKDTreeWithValues[T Comparable[T]](d int, vs []T) *KDTree[T] {
 		})
 	}
 	root := insertAllNew[T](vs, initialIndices, 0)
-	// root := insertAllOld(d, vs, 0)
 	return &KDTree[T]{
 		dimensions: d,
 		root:       root,
@@ -304,20 +271,6 @@ func insertAllNew[T Comparable[T]](vs []T, initialIndices [][]int, cd int) *kdNo
 	return n
 }
 
-func midValue[T Comparable[T]](vs []T, cutIndex []int) (T, int) {
-	i := (len(cutIndex) - 1) / 2
-	mvi := cutIndex[i]
-	return vs[mvi], mvi
-}
-
-func iotaSlice(n int) []int {
-	s := make([]int, n)
-	for i := range s {
-		s[i] = i
-	}
-	return s
-}
-
 func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[T], bool) {
 	if r == nil {
 		return nil, false
@@ -392,34 +345,6 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	return nn
 }
 
-func closest[T Comparable[T]](v, nn1, nn2 *T) *T {
-	if nn1 == nil && nn2 == nil {
-		panic("Both `nn1` and `nn2` inputs are nil!")
-	}
-
-	if nn1 == nil {
-		return nn2
-	}
-	if nn2 == nil {
-		return nn1
-	}
-	if distance(v, nn1) < distance(v, nn2) {
-		return nn1
-	}
-	return nn2
-}
-
-func abs(v int) int {
-	if v < 0 {
-		return -v
-	}
-	return v
-}
-
-func distance[T Comparable[T]](src, dst *T) int {
-	return (*src).Dist(*dst)
-}
-
 func findMin[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
 	if r == nil {
 		return nil
@@ -452,11 +377,4 @@ func findMin[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
 		// return temp[0]
 		return min(lMin, min(rMin, &r.value, tcd), tcd)
 	}
-}
-
-func min[T Comparable[T]](lhs, rhs *T, tcd int) *T {
-	if (*lhs).Order(*rhs, tcd) == Lesser {
-		return lhs
-	}
-	return rhs
 }
