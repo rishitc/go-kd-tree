@@ -1,5 +1,10 @@
 # K-D Tree
 
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+[![HitCount](https://hits.dwyl.com/rishitc/go-kd-tree.svg)](https://hits.dwyl.com/rishitc/go-kd-tree)
+
+[![Tests](https://github.com/rishitc/go-kd-tree/actions/workflows/run-go-tests.yml/badge.svg?branch=main)](https://github.com/rishitc/go-kd-tree/actions/workflows/run-go-tests.yml)
+
 An implementation of KD-Trees written in Go, by [Rishit Chaudhary](https://github.com/rishitc).
 
 ## Supported Operations
