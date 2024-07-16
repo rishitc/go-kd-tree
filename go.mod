@@ -1,4 +1,4 @@
-module kd-tree
+module github.com/rishitc/go-kd-tree
 
 go 1.21.4
 

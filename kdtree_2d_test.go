@@ -3,9 +3,10 @@ package kdtree_test
 import (
 	"encoding/json"
 	"fmt"
-	kdtree "kd-tree"
 	"slices"
 	"testing"
+
+	kdtree "github.com/rishitc/go-kd-tree"
 )
 
 type Tensor2D [2]int

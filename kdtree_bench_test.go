@@ -1,8 +1,9 @@
 package kdtree_test
 
 import (
-	kdtree "kd-tree"
 	"testing"
+
+	kdtree "github.com/rishitc/go-kd-tree"
 )
 
 func BenchmarkNewKDTreeConstruction(b *testing.B) {

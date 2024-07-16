@@ -2,11 +2,12 @@ package kdtree
 
 import (
 	"fmt"
-	"kd-tree/queue"
 	"sort"
 	"strings"
 
-	kdtree "kd-tree/KDTreeEncoding"
+	"github.com/rishitc/go-kd-tree/queue"
+
+	kdtree "github.com/rishitc/go-kd-tree/KDTreeEncoding"
 
 	flatbuffers "github.com/google/flatbuffers/go"
 )
