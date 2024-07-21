@@ -36,6 +36,41 @@ func NewKDTreeWithValues[T Comparable[T]](d int, vs []T) *KDTree[T] {
 	}
 }
 
+func NewKDTreeFromBytes[T Comparable[T]](encodedBytes []byte, decodeItemFunc func([]byte) T) *KDTree[T] {
+	tree := kdtree.GetRootAsKDTree(encodedBytes, 0)
+	if encodingVersion != tree.VersionNumber() {
+		panic("Unsupported encoding version number!")
+	}
+	itemsLength := tree.ItemsLength()
+	if itemsLength != tree.InorderIndicesLength() {
+		msg := fmt.Sprintf("The number of the indices (%d) are not the same as the number of items(%d)!",
+			tree.InorderIndicesLength(), itemsLength)
+		panic(msg)
+	}
+	// Note: This will be useful when I need to reconstruct the exact tree again.
+	// For now the reconstructed tree will not be exactly the same. It will be a rebalanced tree.
+	// This should not introduce any bugs in the code but rather make the tree based operations faster, when
+	// loaded from binary.
+	// preorderIndices := iotaSlice(itemsLength)
+	// inorderIndices := make([]int, itemsLength)
+	// inorderIndexLookup := make([]int, itemsLength)
+	// for i := range inorderIndices {
+	// 	idx := int(tree.InorderIndices(i))
+	// 	inorderIndices[i] = idx
+	// 	inorderIndexLookup[idx] = i
+	// }
+	items := make([]T, itemsLength)
+	for i := 0; i < itemsLength; i++ {
+		itemPtr := new(kdtree.Item)
+		if tree.Items(itemPtr, i) {
+			item := decodeItemFunc(itemPtr.DataBytes())
+			items[i] = item
+		}
+	}
+	dimensions := int(tree.Dimensions())
+	return NewKDTreeWithValues(dimensions, items)
+}
+
 func (t *KDTree[T]) FindMin(targetDimension int) (T, bool) {
 	if t.root == nil || targetDimension >= t.dimensions {
 		return t.zeroVal, false
@@ -182,41 +217,6 @@ func query[T Comparable[T]](getRelativePosition func(T, int) RelativePosition, d
 	default:
 		panic(fmt.Sprintf("Invalid value returned: %v", relInCD))
 	}
-}
-
-func NewKDTreeFromBytes[T Comparable[T]](encodedBytes []byte, decodeItemFunc func([]byte) T) *KDTree[T] {
-	tree := kdtree.GetRootAsKDTree(encodedBytes, 0)
-	if encodingVersion != tree.VersionNumber() {
-		panic("Unsupported encoding version number!")
-	}
-	itemsLength := tree.ItemsLength()
-	if itemsLength != tree.InorderIndicesLength() {
-		msg := fmt.Sprintf("The number of the indices (%d) are not the same as the number of items(%d)!",
-			tree.InorderIndicesLength(), itemsLength)
-		panic(msg)
-	}
-	// Note: This will be useful when I need to reconstruct the exact tree again.
-	// For now the reconstructed tree will not be exactly the same. It will be a rebalanced tree.
-	// This should not introduce any bugs in the code but rather make the tree based operations faster, when
-	// loaded from binary.
-	// preorderIndices := iotaSlice(itemsLength)
-	// inorderIndices := make([]int, itemsLength)
-	// inorderIndexLookup := make([]int, itemsLength)
-	// for i := range inorderIndices {
-	// 	idx := int(tree.InorderIndices(i))
-	// 	inorderIndices[i] = idx
-	// 	inorderIndexLookup[idx] = i
-	// }
-	items := make([]T, itemsLength)
-	for i := 0; i < itemsLength; i++ {
-		itemPtr := new(kdtree.Item)
-		if tree.Items(itemPtr, i) {
-			item := decodeItemFunc(itemPtr.DataBytes())
-			items[i] = item
-		}
-	}
-	dimensions := int(tree.Dimensions())
-	return NewKDTreeWithValues(dimensions, items)
 }
 
 func preorderTraversal[T Comparable[T]](r *kdNode[T]) [][]byte {
