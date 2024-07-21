@@ -96,6 +96,12 @@ func (t *KDTree[T]) Query(getRelativePosition func(T, int) RelativePosition) []T
 	return res
 }
 
+func (t *KDTree[T]) Values() []T {
+	var res []T
+	valuesImpl(t.root, &res)
+	return res
+}
+
 func (t *KDTree[T]) Add(value T) bool {
 	if t.root == nil {
 		t.root = NewKDNode(value)
@@ -115,6 +121,16 @@ func (t *KDTree[T]) Delete(value T) bool {
 		t.sz--
 	}
 	return ok
+}
+
+func valuesImpl[T Comparable[T]](r *kdNode[T], res *[]T) {
+	if r == nil {
+		return
+	}
+
+	*res = append(*res, r.value)
+	valuesImpl(r.left, res)
+	valuesImpl(r.right, res)
 }
 
 func (t *KDTree[T]) String() string {
