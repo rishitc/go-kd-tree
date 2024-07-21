@@ -10,6 +10,14 @@ const (
 	Greater
 )
 
+type RelativePosition int
+
+const (
+	BeforeRange RelativePosition = iota
+	InRange
+	AfterRange
+)
+
 var ErrTreeNotSetup = fmt.Errorf("tree is not setup, make sure you create the tree using NewTree")
 
 type Comparable[T any] interface {

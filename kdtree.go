@@ -55,6 +55,12 @@ func (t *KDTree[T]) NearestNeighbor(value T) (T, bool) {
 	return *res, true
 }
 
+func (t *KDTree[T]) Query(getRelativePosition func(T, int) RelativePosition) []T {
+	var res []T
+	query(getRelativePosition, t.dimensions, &res, t.root, 0)
+	return res
+}
+
 func (t *KDTree[T]) Add(value T) bool {
 	if t.root == nil {
 		t.root = NewKDNode(value)
@@ -151,6 +157,31 @@ func (t *KDTree[T]) Encode() []byte {
 	encodedKDTree := kdtree.KDTreeEnd(builder)
 	builder.Finish(encodedKDTree)
 	return builder.FinishedBytes()
+}
+
+func query[T Comparable[T]](getRelativePosition func(T, int) RelativePosition, d int, res *[]T, r *kdNode[T], cd int) {
+	if r == nil {
+		return
+	}
+
+	ncd := (cd + 1) % d
+
+	rel := getRelativePosition(r.value, -1)
+	if rel == InRange {
+		*res = append(*res, r.value)
+	}
+
+	switch relInCD := getRelativePosition(r.value, cd); relInCD {
+	case BeforeRange:
+		query(getRelativePosition, d, res, r.right, ncd)
+	case AfterRange:
+		query(getRelativePosition, d, res, r.left, ncd)
+	case InRange:
+		query(getRelativePosition, d, res, r.left, ncd)
+		query(getRelativePosition, d, res, r.right, ncd)
+	default:
+		panic(fmt.Sprintf("Invalid value returned: %v", relInCD))
+	}
 }
 
 func NewKDTreeFromBytes[T Comparable[T]](encodedBytes []byte, decodeItemFunc func([]byte) T) *KDTree[T] {
