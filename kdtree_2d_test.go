@@ -765,3 +765,55 @@ func Test2DTreeEncodeDecode(t *testing.T) {
 		t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", expectedTree, tree)
 	}
 }
+
+func Test2DTreeBalance(t *testing.T) {
+	treeNodes := kdtree.NewKDNode(Tensor2D{20, 15}).
+		SetLeft(
+			kdtree.NewKDNode(Tensor2D{3, 25}),
+		).
+		SetRight(
+			kdtree.NewKDNode(Tensor2D{30, 40}).
+				SetRight(
+					kdtree.NewKDNode(Tensor2D{25, 50}).
+						SetRight(
+							kdtree.NewKDNode(Tensor2D{28, 47}).
+								SetRight(
+									kdtree.NewKDNode(Tensor2D{40, 60}),
+								),
+						),
+				),
+		)
+	tree1 := kdtree.NewTestKDTree(2, treeNodes)
+
+	expTreeNodes1 := kdtree.NewKDNode(Tensor2D{25, 50}).
+		SetLeft(
+			kdtree.NewKDNode(Tensor2D{20, 15}).
+				SetRight(
+					kdtree.NewKDNode(Tensor2D{3, 25}),
+				),
+		).
+		SetRight(
+			kdtree.NewKDNode(Tensor2D{28, 47}).
+				SetLeft(
+					kdtree.NewKDNode(Tensor2D{30, 40}),
+				).
+				SetRight(
+					kdtree.NewKDNode(Tensor2D{40, 60}),
+				),
+		)
+	testTable := []struct {
+		input    *kdtree.KDTree[Tensor2D]
+		expected *kdtree.KDTree[Tensor2D]
+	}{
+		{
+			input:    tree1,
+			expected: kdtree.NewTestKDTree(2, expTreeNodes1),
+		},
+	}
+	for _, v := range testTable {
+		v.input.Balance()
+		if !kdtree.IdenticalTrees(v.input, v.expected) {
+			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, v.input)
+		}
+	}
+}

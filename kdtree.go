@@ -221,6 +221,11 @@ func (t *KDTree[T]) Encode() []byte {
 	return builder.FinishedBytes()
 }
 
+// Balance rebalance the k-d tree by recreating it.
+func (t *KDTree[T]) Balance() {
+	t.root = NewKDTreeWithValues(t.dimensions, t.Values()).root
+}
+
 func query[T Comparable[T]](getRelativePosition func(T, int) RelativePosition, d int, res *[]T, r *kdNode[T], cd int) {
 	if r == nil {
 		return
