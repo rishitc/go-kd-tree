@@ -7,6 +7,13 @@ func min[T Comparable[T]](lhs, rhs *T, tcd int) *T {
 	return rhs
 }
 
+func max[T Comparable[T]](lhs, rhs *T, tcd int) *T {
+	if (*lhs).Order(*rhs, tcd) == Greater {
+		return lhs
+	}
+	return rhs
+}
+
 func distance[T Comparable[T]](src, dst *T) int {
 	return (*src).Dist(*dst)
 }

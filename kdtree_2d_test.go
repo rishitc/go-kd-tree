@@ -374,6 +374,72 @@ func Test2DFindMin2(t *testing.T) {
 	}
 }
 
+func Test2DFindMax1(t *testing.T) {
+	const dimensions = 2
+	ps := []Tensor2D{
+		{35, 90},
+		{60, 80},
+		{51, 75},
+		{70, 70},
+		{50, 50},
+		{25, 40},
+		{10, 30},
+		{1, 10},
+		{55, 1},
+	}
+	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	testTable := []struct {
+		input    int
+		expected Tensor2D
+	}{
+		{
+			input:    0,
+			expected: Tensor2D{70, 70},
+		},
+		{
+			input:    1,
+			expected: Tensor2D{35, 90},
+		},
+	}
+	for _, v := range testTable {
+		nn, ok := tree.FindMax(v.input)
+		if !ok || !slices.Equal(nn[:], v.expected[:]) {
+			t.Fatalf("Expected closest point: %v, got %v", v.expected, nn)
+		}
+	}
+}
+
+func Test2DFindMax2(t *testing.T) {
+	const dimensions = 2
+	ps := []Tensor2D{
+		{35, 90},
+		{60, 80},
+		{51, 75},
+		{70, 70},
+		{50, 50},
+		{25, 40},
+		{10, 30},
+		{1, 10},
+		{55, 1},
+	}
+	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	testTable := []struct {
+		input    int
+		expected Tensor2D
+	}{
+		{
+			input:    1,
+			expected: Tensor2D{55, 1},
+		},
+	}
+	for _, v := range testTable {
+		nn, ok := tree.FindMin(v.input)
+		if !ok || !slices.Equal(nn[:], v.expected[:]) {
+			t.Fatalf("Expected closest point: %v, got %v", v.expected, nn)
+		}
+	}
+}
+
 func Test2DDeleteAllNodesInTree(t *testing.T) {
 	treeNodes := kdtree.NewKDNode(Tensor2D{5, 6})
 	tree := kdtree.NewTestKDTree(2, treeNodes)

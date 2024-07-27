@@ -82,6 +82,17 @@ func (t *KDTree[T]) FindMin(targetDimension int) (T, bool) {
 	return *res, true
 }
 
+func (t *KDTree[T]) FindMax(targetDimension int) (T, bool) {
+	if t.root == nil || targetDimension >= t.dimensions {
+		return t.zeroVal, false
+	}
+	res := findMax(t.dimensions, targetDimension, 0, t.root)
+	if res == nil {
+		return t.zeroVal, false
+	}
+	return *res, true
+}
+
 func (t *KDTree[T]) NearestNeighbor(value T) (T, bool) {
 	res := nearestNeighbor(t.dimensions, &value, nil, 0, t.root)
 	if res == nil {
@@ -424,5 +435,34 @@ func findMin[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
 		// })
 		// return temp[0]
 		return min(lMin, min(rMin, &r.value, tcd), tcd)
+	}
+}
+
+func findMax[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
+	if r == nil {
+		return nil
+	}
+
+	var lMax *T
+	var rMax *T
+	ncd := (cd + 1) % d
+	rMax = findMax(d, tcd, ncd, r.right)
+	if tcd != cd {
+		lMax = findMax(d, tcd, ncd, r.left)
+	}
+	if lMax == nil && rMax == nil {
+		return &r.value
+	} else if lMax == nil {
+		if (*rMax).Order(r.value, tcd) == Greater {
+			return rMax
+		}
+		return &r.value
+	} else if rMax == nil {
+		if (*lMax).Order(r.value, tcd) == Greater {
+			return lMax
+		}
+		return &r.value
+	} else {
+		return max(lMax, max(rMax, &r.value, tcd), tcd)
 	}
 }
