@@ -101,7 +101,7 @@ func (t *KDTree[T]) NearestNeighbor(value T) (T, bool) {
 	return *res, true
 }
 
-func (t *KDTree[T]) Query(getRelativePosition func(T, int) RelativePosition) []T {
+func (t *KDTree[T]) Query(getRelativePosition RangeFunc[T]) []T {
 	var res []T
 	query(getRelativePosition, t.dimensions, &res, t.root, 0)
 	return res
@@ -226,18 +226,17 @@ func (t *KDTree[T]) Balance() {
 	t.root = NewKDTreeWithValues(t.dimensions, t.Values()).root
 }
 
-func query[T Comparable[T]](getRelativePosition func(T, int) RelativePosition, d int, res *[]T, r *kdNode[T], cd int) {
+func query[T Comparable[T]](getRelativePosition RangeFunc[T], d int, res *[]T, r *kdNode[T], cd int) {
 	if r == nil {
 		return
 	}
-
-	ncd := (cd + 1) % d
 
 	rel := getRelativePosition(r.value, -1)
 	if rel == InRange {
 		*res = append(*res, r.value)
 	}
 
+	ncd := (cd + 1) % d
 	switch relInCD := getRelativePosition(r.value, cd); relInCD {
 	case BeforeRange:
 		query(getRelativePosition, d, res, r.right, ncd)

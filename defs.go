@@ -2,6 +2,8 @@ package kdtree
 
 import "fmt"
 
+type RangeFunc[T Comparable[T]] func(T, int) RelativePosition
+
 type Relation int
 
 const (
