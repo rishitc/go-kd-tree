@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	kdtree "github.com/rishitc/go-kd-tree"
+	"github.com/stretchr/testify/assert"
 )
 
 type Tensor2D [2]int
@@ -815,5 +816,177 @@ func Test2DTreeBalance(t *testing.T) {
 		if !kdtree.IdenticalTrees(v.input, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, v.input)
 		}
+	}
+}
+
+func Test2DTree_Query(t *testing.T) {
+	const dimensions = 2
+	inputTensor2D := []Tensor2D{{1, 0}, {1, 8}, {2, 2}, {2, 10}, {3, 4}, {4, 1}, {5, 4}, {6, 8}, {7, 4}, {7, 7}, {8, 2}, {8, 5}, {9, 9}, {3, 6}, {4, 2}, {9, 2}, {6, 5}, {3, 8}, {6, 2}, {1, 3}, {3, 3}, {6, 4}, {9, 8}, {2, 1}, {2, 8}, {3, 1}, {7, 3}, {3, 9}, {4, 4}, {5, 3}, {9, 6}}
+	tests := []struct {
+		name     string
+		tree     *kdtree.KDTree[Tensor2D]
+		input    kdtree.RangeFunc[Tensor2D]
+		expected []Tensor2D
+	}{
+		{
+			name: "out of range x (lower)",
+			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			input: func(td Tensor2D, i int) kdtree.RelativePosition {
+				switch i {
+				case -1:
+					if x, y := td[0], td[1]; -2 <= x && x < -1 && 2 <= y && y < 10 {
+						return kdtree.InRange
+					}
+					return kdtree.AfterRange
+				case 0:
+					if x := td[0]; x < -2 {
+						return kdtree.BeforeRange
+					} else if x >= -1 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				case 1:
+					if y := td[1]; y < 2 {
+						return kdtree.BeforeRange
+					} else if y >= 10 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				}
+				return kdtree.AfterRange
+			},
+			expected: []Tensor2D(nil),
+		},
+		{
+			name: "out of range y (lower)",
+			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			input: func(td Tensor2D, i int) kdtree.RelativePosition {
+				switch i {
+				case -1:
+					if x, y := td[0], td[1]; 2 <= x && x < 10 && -2 <= y && y < -1 {
+						return kdtree.InRange
+					}
+					return kdtree.AfterRange
+				case 0:
+					if x := td[0]; x < 2 {
+						return kdtree.BeforeRange
+					} else if x >= 10 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				case 1:
+					if y := td[1]; y < -2 {
+						return kdtree.BeforeRange
+					} else if y >= -1 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				}
+				return kdtree.AfterRange
+			},
+			expected: []Tensor2D(nil),
+		},
+		{
+			name: "out of range x (higher)",
+			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			input: func(td Tensor2D, i int) kdtree.RelativePosition {
+				switch i {
+				case -1:
+					if x, y := td[0], td[1]; 20 <= x && x < 30 && 2 <= y && y < 10 {
+						return kdtree.InRange
+					}
+					return kdtree.AfterRange
+				case 0:
+					if x := td[0]; x < 20 {
+						return kdtree.BeforeRange
+					} else if x >= 30 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				case 1:
+					if y := td[1]; y < 2 {
+						return kdtree.BeforeRange
+					} else if y >= 10 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				}
+				return kdtree.AfterRange
+			},
+			expected: []Tensor2D(nil),
+		},
+		{
+			name: "out of range y (higher)",
+			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			input: func(td Tensor2D, i int) kdtree.RelativePosition {
+				switch i {
+				case -1:
+					if x, y := td[0], td[1]; 2 <= x && x < 10 && 20 <= y && y < 30 {
+						return kdtree.InRange
+					}
+					return kdtree.AfterRange
+				case 0:
+					if x := td[0]; x < 2 {
+						return kdtree.BeforeRange
+					} else if x >= 10 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				case 1:
+					if y := td[1]; y < 20 {
+						return kdtree.BeforeRange
+					} else if y >= 30 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				}
+				return kdtree.AfterRange
+			},
+			expected: []Tensor2D(nil),
+		},
+		{
+			name: "some values in range",
+			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			input: func(td Tensor2D, i int) kdtree.RelativePosition {
+				switch i {
+				case -1:
+					if x, y := td[0], td[1]; 1 <= x && x < 2 && 2 <= y && y < 10 {
+						return kdtree.InRange
+					}
+					return kdtree.AfterRange
+				case 0:
+					if x := td[0]; x < -2 {
+						return kdtree.BeforeRange
+					} else if x >= -1 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				case 1:
+					if y := td[1]; y < 2 {
+						return kdtree.BeforeRange
+					} else if y >= 10 {
+						return kdtree.AfterRange
+					} else {
+						return kdtree.InRange
+					}
+				}
+				return kdtree.AfterRange
+			},
+			expected: []Tensor2D{{1, 3}, {1, 8}},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, test.tree.Query(test.input))
+		})
 	}
 }
