@@ -31,3 +31,19 @@ func insertAllOld[T Comparable[T]](d int, vs []T, cd int) *kdNode[T] {
 	n.right = insertAllOld(d, rv, ncd)
 	return n
 }
+
+func (t *KDTree[T]) OldValues() []T {
+	var res []T
+	oldValuesImpl(t.root, &res)
+	return res
+}
+
+func oldValuesImpl[T Comparable[T]](r *kdNode[T], res *[]T) {
+	if r == nil {
+		return
+	}
+
+	*res = append(*res, r.value)
+	valuesImpl(r.left, res)
+	valuesImpl(r.right, res)
+}

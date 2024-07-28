@@ -108,7 +108,7 @@ func (t *KDTree[T]) Query(getRelativePosition func(T, int) RelativePosition) []T
 }
 
 func (t *KDTree[T]) Values() []T {
-	var res []T
+	res := make([]T, 0, t.sz)
 	valuesImpl(t.root, &res)
 	return res
 }
