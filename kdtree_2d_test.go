@@ -3,6 +3,7 @@ package kdtree_test
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"slices"
 	"testing"
 
@@ -63,6 +64,16 @@ func decodeTensor2D(bytes []byte) Tensor2D {
 		panic(msg)
 	}
 	return v
+}
+
+func generateRandomTensor2DSlice(n int) []Tensor2D {
+	arrays := make([]Tensor2D, n)
+	r := rand.New(rand.NewSource(43))
+	for i := range arrays {
+		array := Tensor2D{r.Int(), r.Int()}
+		arrays[i] = array
+	}
+	return arrays
 }
 
 func Test2DNearestNeighbor1(t *testing.T) {

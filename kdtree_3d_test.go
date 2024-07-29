@@ -73,6 +73,16 @@ func decodeTensor3D(bytes []byte) Tensor3D {
 	return v
 }
 
+func generateRandomTensor3DSlice(n int) []Tensor3D {
+	arrays := make([]Tensor3D, n)
+	r := rand.New(rand.NewSource(43))
+	for i := range arrays {
+		array := Tensor3D{r.Int(), r.Int(), r.Int()}
+		arrays[i] = array
+	}
+	return arrays
+}
+
 func Test3DNearestNeighbor1(t *testing.T) {
 	const dimensions = 3
 	ps := []Tensor3D{
@@ -107,15 +117,6 @@ func Test3DNearestNeighbor1(t *testing.T) {
 			t.Fatalf("Expected closest point: %v, got %v", v.expected, nn)
 		}
 	}
-}
-
-func generateRandomArrays(n int) []Tensor3D {
-	arrays := make([]Tensor3D, n)
-	for i := range arrays {
-		array := Tensor3D{rand.Int(), rand.Int(), rand.Int()}
-		arrays[i] = array
-	}
-	return arrays
 }
 
 func Test3DNearestNeighbor2(t *testing.T) {
