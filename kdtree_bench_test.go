@@ -13,7 +13,7 @@ func BenchmarkNewKDTreeConstruction(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		// Generate a slice of random arrays
-		arrays := generateRandomArrays(numArrays)
+		arrays := generateRandomTensor3DSlice(numArrays)
 		// Run the KD-tree construction
 		b.StartTimer()
 		kdtree.NewKDTreeWithValues(dimensions, arrays)
@@ -27,7 +27,7 @@ func BenchmarkOldKDTreeConstruction(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		// Generate a slice of random arrays
-		arrays := generateRandomArrays(numArrays)
+		arrays := generateRandomTensor3DSlice(numArrays)
 		// Run the KD-tree construction
 		b.StartTimer()
 		kdtree.OldKDTreeWithValues(dimensions, arrays)
@@ -41,7 +41,7 @@ func BenchmarkOldKDTreeValues(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		// Generate a slice of random arrays
-		arrays := generateRandomArrays(numArrays)
+		arrays := generateRandomTensor3DSlice(numArrays)
 		// Run the KD-tree construction
 		t := kdtree.NewKDTreeWithValues(dimensions, arrays)
 		b.StartTimer()
@@ -57,7 +57,7 @@ func BenchmarkNewKDTreeValues(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		// Generate a slice of random arrays
-		arrays := generateRandomArrays(numArrays)
+		arrays := generateRandomTensor3DSlice(numArrays)
 		// Run the KD-tree construction
 		t := kdtree.NewKDTreeWithValues(dimensions, arrays)
 		b.StartTimer()
