@@ -251,6 +251,61 @@ func Test2DNearestNeighbor5(t *testing.T) {
 	}
 }
 
+func tensor2DSortFunc(a, b Tensor2D) int {
+	if a[0] != b[0] {
+		return a[0] - b[0]
+	} else {
+		return a[1] - b[1]
+	}
+}
+
+func Test2DKNearestNeighbor1(t *testing.T) {
+	const dimensions = 2
+	type input struct {
+		p Tensor2D
+		k int
+	}
+	ps := []Tensor2D{
+		{50, 50},
+		{10, 25},
+		{40, 20},
+		{25, 80},
+		{70, 70},
+		{60, 10},
+		{60, 90},
+	}
+	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	testTable := map[string]struct {
+		input    input
+		expected []Tensor2D
+	}{
+		"Find the 2 closest neighbors to a point that is not in the KD tree.": {
+			input:    input{p: [2]int{25, 25}, k: 2},
+			expected: []Tensor2D{{40, 20}, {10, 25}},
+		},
+		"The closest neighbor to a point that is in the KD tree.": {
+			input:    input{p: [2]int{60, 90}, k: 1},
+			expected: []Tensor2D{{60, 90}},
+		},
+		"The three closest neighbors to a point that is in the KD tree.": {
+			input:    input{p: [2]int{70, 70}, k: 3},
+			expected: []Tensor2D{{50, 50}, {60, 90}, {70, 70}},
+		},
+	}
+	for name, st := range testTable {
+		t.Run(name, func(t *testing.T) {
+			nns := tree.KNearestNeighbor(st.input.p, st.input.k)
+			slices.SortFunc(nns, tensor2DSortFunc)
+			slices.SortFunc(st.expected, tensor2DSortFunc)
+			for i := range len(st.expected) {
+				if st.expected[i][0] != nns[i][0] || st.expected[i][1] != nns[i][1] {
+					t.Fatalf("Expected point: %v, got %v", st.expected[i], nns[i])
+				}
+			}
+		})
+	}
+}
+
 func Test2DNodeAddition1(t *testing.T) {
 	const dimensions = 2
 	ps := []Tensor2D{

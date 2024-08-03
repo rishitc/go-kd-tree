@@ -1,6 +1,7 @@
 package kdtree
 
 import (
+	"container/heap"
 	"fmt"
 	"sort"
 	"strings"
@@ -406,6 +407,93 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	}
 
 	return nn
+}
+
+func (t *KDTree[T]) KNearestNeighbor(value T, k int) []T {
+	if t == nil || t.root == nil || t.sz < k {
+		return nil
+	}
+
+	pqRes := NewBoundedPriorityQueue[T](k)
+	kNearestNeighbor(k, t.dimensions, &value, &pqRes, 0, t.root)
+
+	res := make([]T, 0, pqRes.Len())
+	for pqRes.Len() != 0 {
+		d := heap.Pop(&pqRes).(Item[T]).Data
+		res = append(res, d)
+	}
+
+	return res
+}
+
+type direction bool
+
+const (
+	left  direction = true
+	right           = false
+)
+
+type nodeInfo[T Comparable[T]] struct {
+	node *kdNode[T]
+	dir  direction
+}
+
+func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[T], cd int, r *kdNode[T]) {
+	if r == nil {
+		return
+	}
+
+	ncd := cd
+
+	var path []nodeInfo[T]
+	for r != nil {
+		info := nodeInfo[T]{
+			node: r,
+		}
+		if rel := (*v).Order(r.value, ncd); rel == Lesser {
+			r = r.left
+			info.dir = left
+		} else {
+			r = r.right
+			info.dir = right
+		}
+		path = append(path, info)
+
+		ncd = (ncd + 1) % d
+	}
+
+	ncd = (ncd - 1 + d) % d // Go back to the dimension used for splitting at the leaf node.
+	for path, cn, cDir := popLast(path); cn != nil; path, cn, cDir = popLast(path) {
+		currentDistance := (*v).Dist(cn.value)
+		heap.Push(pq, Item[T]{
+			Data:     cn.value,
+			Priority: currentDistance,
+		})
+
+		if pq.Len() < pq.Capacity() || (*v).DistDim(cn.value, ncd) < getFarthestDistance(pq) {
+			var next *kdNode[T]
+			if cDir == left {
+				next = cn.right
+			} else {
+				next = cn.left
+			}
+			kNearestNeighbor(k, d, v, pq, (ncd+1)%d, next)
+		}
+		ncd = (ncd - 1 + d) % d
+	}
+}
+
+func getFarthestDistance[T Comparable[T]](pq *BoundedPriorityQueue[T]) int {
+	v := pq.Peek().(Item[T])
+	return v.Priority
+}
+
+func popLast[T Comparable[T]](arr []nodeInfo[T]) ([]nodeInfo[T], *kdNode[T], direction) {
+	if len(arr) == 0 {
+		return arr, nil, left
+	}
+	li := len(arr) - 1
+	return arr[:li], arr[li].node, arr[li].dir
 }
 
 func findMin[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
