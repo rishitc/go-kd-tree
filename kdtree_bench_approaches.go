@@ -16,7 +16,7 @@ func insertAllOld[T Comparable[T]](d int, vs []T, cd int) *kdNode[T] {
 		return nil
 	}
 	sort.Slice(vs, func(i, j int) bool {
-		return vs[i].Order(vs[j], cd) == Lesser // vs[i].Get(cd) < vs[j].Get(cd)
+		return vs[i].Order(vs[j], cd) < 0 // vs[i].Get(cd) < vs[j].Get(cd)
 	})
 	mi := (len(vs) - 1) / 2
 	mv := vs[mi]
@@ -44,6 +44,6 @@ func oldValuesImpl[T Comparable[T]](r *kdNode[T], res *[]T) {
 	}
 
 	*res = append(*res, r.value)
-	valuesImpl(r.left, res)
-	valuesImpl(r.right, res)
+	oldValuesImpl(r.left, res)
+	oldValuesImpl(r.right, res)
 }

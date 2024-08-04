@@ -1,14 +1,14 @@
 package kdtree
 
 func min[T Comparable[T]](lhs, rhs *T, tcd int) *T {
-	if (*lhs).Order(*rhs, tcd) == Lesser {
+	if (*lhs).Order(*rhs, tcd) < 0 {
 		return lhs
 	}
 	return rhs
 }
 
 func max[T Comparable[T]](lhs, rhs *T, tcd int) *T {
-	if (*lhs).Order(*rhs, tcd) == Greater {
+	if (*lhs).Order(*rhs, tcd) > 0 {
 		return lhs
 	}
 	return rhs

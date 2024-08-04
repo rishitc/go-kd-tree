@@ -6,7 +6,7 @@ func NewTestKDTree[T Comparable[T]](d int, r *kdNode[T]) *KDTree[T] {
 		root:       r,
 		isSetup:    true,
 		zeroVal:    *new(T),
-		sz:         countNodes(r),
+		size:       countNodes(r),
 	}
 }
 

@@ -1,6 +1,6 @@
-package kdtree
+package internal
 
-func abs(v int) int {
+func Abs(v int) int {
 	if v < 0 {
 		return -v
 	}

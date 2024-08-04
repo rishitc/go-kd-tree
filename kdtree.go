@@ -6,11 +6,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rishitc/go-kd-tree/queue"
-
-	kdtree "github.com/rishitc/go-kd-tree/KDTreeEncoding"
-
 	flatbuffers "github.com/google/flatbuffers/go"
+	encoding "github.com/rishitc/go-kd-tree/internal/KDTreeEncoding"
+	internal "github.com/rishitc/go-kd-tree/internal/utils"
 )
 
 func NewKDNode[T Comparable[T]](value T) *kdNode[T] {
@@ -20,12 +18,12 @@ func NewKDNode[T Comparable[T]](value T) *kdNode[T] {
 }
 
 func NewKDTreeWithValues[T Comparable[T]](d int, vs []T) *KDTree[T] {
-	sz := len(vs)
+	size := len(vs)
 	initialIndices := make([][]int, d)
 	for cd := range initialIndices {
-		initialIndices[cd] = iotaSlice(len(vs))
+		initialIndices[cd] = internal.IotaSlice(len(vs))
 		sort.Slice(initialIndices[cd], func(i, j int) bool {
-			return vs[initialIndices[cd][i]].Order(vs[initialIndices[cd][j]], cd) == Lesser
+			return vs[initialIndices[cd][i]].Order(vs[initialIndices[cd][j]], cd) < 0
 		})
 	}
 	root := insertAllNew[T](vs, initialIndices, 0)
@@ -33,12 +31,12 @@ func NewKDTreeWithValues[T Comparable[T]](d int, vs []T) *KDTree[T] {
 		dimensions: d,
 		root:       root,
 		isSetup:    true,
-		sz:         sz,
+		size:       size,
 	}
 }
 
 func NewKDTreeFromBytes[T Comparable[T]](encodedBytes []byte, decodeItemFunc func([]byte) T) *KDTree[T] {
-	tree := kdtree.GetRootAsKDTree(encodedBytes, 0)
+	tree := encoding.GetRootAsKDTree(encodedBytes, 0)
 	if encodingVersion != tree.VersionNumber() {
 		panic("Unsupported encoding version number!")
 	}
@@ -62,7 +60,7 @@ func NewKDTreeFromBytes[T Comparable[T]](encodedBytes []byte, decodeItemFunc fun
 	// }
 	items := make([]T, itemsLength)
 	for i := 0; i < itemsLength; i++ {
-		itemPtr := new(kdtree.Item)
+		itemPtr := new(encoding.Item)
 		if tree.Items(itemPtr, i) {
 			item := decodeItemFunc(itemPtr.DataBytes())
 			items[i] = item
@@ -109,7 +107,7 @@ func (t *KDTree[T]) Query(getRelativePosition RangeFunc[T]) []T {
 }
 
 func (t *KDTree[T]) Values() []T {
-	res := make([]T, 0, t.sz)
+	res := make([]T, 0, t.size)
 	valuesImpl(t.root, &res)
 	return res
 }
@@ -121,7 +119,7 @@ func (t *KDTree[T]) Add(value T) bool {
 	}
 	res := add(t.dimensions, value, 0, t.root)
 	if res {
-		t.sz++
+		t.size++
 	}
 	return res
 }
@@ -130,7 +128,7 @@ func (t *KDTree[T]) Delete(value T) bool {
 	ok := false
 	t.root, ok = deleteNode(t.dimensions, value, 0, t.root)
 	if ok {
-		t.sz--
+		t.size--
 	}
 	return ok
 }
@@ -147,11 +145,11 @@ func valuesImpl[T Comparable[T]](r *kdNode[T], res *[]T) {
 
 func (t *KDTree[T]) String() string {
 	b := strings.Builder{}
-	var q queue.Queue[*kdNode[T]] = queue.NewLLQueue[*kdNode[T]]()
+	var q Queue[*kdNode[T]] = NewLLQueue[*kdNode[T]]()
 	q.Push(t.root)
 	for !q.Empty() {
-		sz := q.Size()
-		for i := 0; i < sz; i++ {
+		size := q.Size()
+		for i := 0; i < size; i++ {
 			n, _ := q.Pop()
 			if n != nil {
 				b.WriteString(n.value.String())
@@ -172,15 +170,15 @@ const encodingVersion uint32 = 0
 func (t *KDTree[T]) Encode() []byte {
 	encodedPreorderItems := preorderTraversal(t.root)
 	itemCount := len(encodedPreorderItems)
-	if itemCount != t.sz {
-		msg := fmt.Sprintf("itemCount (%d) and t.sz (%d) don't have the same size! Some bookkeeping has gone wrong!", itemCount, t.sz)
+	if itemCount != t.size {
+		msg := fmt.Sprintf("itemCount (%d) and t.size (%d) don't have the same size! Some bookkeeping has gone wrong!", itemCount, t.size)
 		panic(msg)
 	}
-	encodedInorderIndices := inorderTraversal(t.root, t.sz)
+	encodedInorderIndices := inorderTraversal(t.root, t.size)
 
 	builder := flatbuffers.NewBuilder(256)
 
-	kdtree.KDTreeStartInorderIndicesVector(builder, itemCount)
+	encoding.KDTreeStartInorderIndicesVector(builder, itemCount)
 	for i := itemCount - 1; i >= 0; i-- {
 		idx := encodedInorderIndices[i]
 		builder.PrependInt64(int64(idx))
@@ -190,34 +188,34 @@ func (t *KDTree[T]) Encode() []byte {
 	var encodedItems []flatbuffers.UOffsetT
 	for i := 0; i < itemCount; i++ {
 		item := encodedPreorderItems[i]
-		sz := len(item)
+		size := len(item)
 
-		kdtree.ItemStartDataVector(builder, sz)
-		for i := sz - 1; i >= 0; i-- {
+		encoding.ItemStartDataVector(builder, size)
+		for i := size - 1; i >= 0; i-- {
 			itemByte := item[i]
 			builder.PrependByte(itemByte)
 		}
-		itemBytesVector := builder.EndVector(sz)
+		itemBytesVector := builder.EndVector(size)
 
-		kdtree.ItemStart(builder)
-		kdtree.ItemAddData(builder, itemBytesVector)
-		encodedItem := kdtree.ItemEnd(builder)
+		encoding.ItemStart(builder)
+		encoding.ItemAddData(builder, itemBytesVector)
+		encodedItem := encoding.ItemEnd(builder)
 
 		encodedItems = append(encodedItems, encodedItem)
 	}
 
-	kdtree.KDTreeStartItemsVector(builder, itemCount)
+	encoding.KDTreeStartItemsVector(builder, itemCount)
 	for i := itemCount - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(encodedItems[i])
 	}
 	items := builder.EndVector(itemCount)
 
-	kdtree.KDTreeStart(builder)
-	kdtree.KDTreeAddVersionNumber(builder, encodingVersion)
-	kdtree.KDTreeAddDimensions(builder, uint32(t.dimensions))
-	kdtree.KDTreeAddInorderIndices(builder, inorderIndices)
-	kdtree.KDTreeAddItems(builder, items)
-	encodedKDTree := kdtree.KDTreeEnd(builder)
+	encoding.KDTreeStart(builder)
+	encoding.KDTreeAddVersionNumber(builder, encodingVersion)
+	encoding.KDTreeAddDimensions(builder, uint32(t.dimensions))
+	encoding.KDTreeAddInorderIndices(builder, inorderIndices)
+	encoding.KDTreeAddItems(builder, items)
+	encodedKDTree := encoding.KDTreeEnd(builder)
 	builder.Finish(encodedKDTree)
 	return builder.FinishedBytes()
 }
@@ -266,10 +264,10 @@ func preorderTraversalImpl[T Comparable[T]](r *kdNode[T], res *[][]byte) {
 	preorderTraversalImpl(r.right, res)
 }
 
-func inorderTraversal[T Comparable[T]](r *kdNode[T], sz int) []int {
+func inorderTraversal[T Comparable[T]](r *kdNode[T], size int) []int {
 	preorderIndex := 0
 	inorderIndex := 0
-	res := make([]int, sz)
+	res := make([]int, size)
 	inorderTraversalImpl(r, &preorderIndex, &inorderIndex, &res)
 	return res
 }
@@ -318,7 +316,7 @@ func insertAllNew[T Comparable[T]](vs []T, initialIndices [][]int, cd int) *kdNo
 				continue
 			}
 			v := vs[idx]
-			if v.Order(mv, cd) == Lesser {
+			if v.Order(mv, cd) < 0 {
 				lh[i-1][lhi] = idx
 				lhi++
 			} else {
@@ -353,7 +351,7 @@ func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[
 		} else {
 			r = nil
 		}
-	} else if value.Order(r.value, cd) == Lesser {
+	} else if value.Order(r.value, cd) < 0 {
 		r.left, ok = deleteNode(d, value, ncd, r.left)
 	} else {
 		r.right, ok = deleteNode(d, value, ncd, r.right)
@@ -368,7 +366,7 @@ func add[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) bool {
 
 	ncd := (cd + 1) % d
 	rel := value.Order(r.value, cd)
-	if rel == Lesser {
+	if rel < 0 {
 		if r.left == nil {
 			r.left = NewKDNode(value)
 		} else {
@@ -390,7 +388,7 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	}
 
 	var nextBranch, otherBranch *kdNode[T]
-	if (*v).Order(r.value, cd) == Lesser /* [cd] < r.value[cd]*/ {
+	if (*v).Order(r.value, cd) < 0 /* [cd] < r.value[cd]*/ {
 		nextBranch, otherBranch = r.left, r.right
 	} else {
 		nextBranch, otherBranch = r.right, r.left
@@ -399,8 +397,8 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	nn = nearestNeighbor(d, v, nn, ncd, nextBranch)
 	nn = closest(v, nn, &r.value)
 
-	nearestDist := abs(distance(v, nn))
-	dist := abs((*v).DistDim(r.value, cd))
+	nearestDist := internal.Abs(distance(v, nn))
+	dist := internal.Abs((*v).DistDim(r.value, cd))
 
 	if dist <= nearestDist {
 		nn = closest(v, nearestNeighbor(d, v, nn, ncd, otherBranch), nn)
@@ -410,7 +408,7 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 }
 
 func (t *KDTree[T]) KNearestNeighbor(value T, k int) []T {
-	if t == nil || t.root == nil || t.sz < k {
+	if t == nil || t.root == nil || t.size < k {
 		return nil
 	}
 
@@ -450,7 +448,7 @@ func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[
 		info := nodeInfo[T]{
 			node: r,
 		}
-		if rel := (*v).Order(r.value, ncd); rel == Lesser {
+		if rel := (*v).Order(r.value, ncd); rel < 0 {
 			r = r.left
 			info.dir = left
 		} else {
@@ -511,19 +509,19 @@ func findMin[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
 	if lMin == nil && rMin == nil {
 		return &r.value
 	} else if lMin == nil {
-		if (*rMin).Order(r.value, tcd) == Lesser {
+		if (*rMin).Order(r.value, tcd) < 0 {
 			return rMin
 		}
 		return &r.value
 	} else if rMin == nil {
-		if (*lMin).Order(r.value, tcd) == Lesser {
+		if (*lMin).Order(r.value, tcd) < 0 {
 			return lMin
 		}
 		return &r.value
 	} else {
 		// temp := []*T{lMin, rMin, &r.value}
 		// sort.Slice(temp, func(i, j int) bool {
-		// 	return (*temp[i]).Order(*temp[j], tcd) == Lesser
+		// 	return (*temp[i]).Order(*temp[j], tcd) < 0
 		// })
 		// return temp[0]
 		return min(lMin, min(rMin, &r.value, tcd), tcd)
@@ -545,12 +543,12 @@ func findMax[T Comparable[T]](d, tcd, cd int, r *kdNode[T]) *T {
 	if lMax == nil && rMax == nil {
 		return &r.value
 	} else if lMax == nil {
-		if (*rMax).Order(r.value, tcd) == Greater {
+		if (*rMax).Order(r.value, tcd) > 0 {
 			return rMax
 		}
 		return &r.value
 	} else if rMax == nil {
-		if (*lMax).Order(r.value, tcd) == Greater {
+		if (*lMax).Order(r.value, tcd) > 0 {
 			return lMax
 		}
 		return &r.value

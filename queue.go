@@ -1,4 +1,4 @@
-package queue
+package kdtree
 
 type Queue[T any] interface {
 	Pop() (T, bool)

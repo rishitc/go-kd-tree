@@ -1,6 +1,6 @@
-package kdtree
+package internal
 
-func iotaSlice(n int) []int {
+func IotaSlice(n int) []int {
 	s := make([]int, n)
 	for i := range s {
 		s[i] = i
