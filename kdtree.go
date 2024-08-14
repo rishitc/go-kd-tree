@@ -112,16 +112,14 @@ func (t *KDTree[T]) Values() []T {
 	return res
 }
 
-func (t *KDTree[T]) Add(value T) bool {
+func (t *KDTree[T]) Insert(value T) {
 	if t.root == nil {
 		t.root = NewKDNode(value)
-		return true
+		return
 	}
-	res := add(t.dimensions, value, 0, t.root)
-	if res {
+	if insert(t.dimensions, value, 0, t.root) {
 		t.size++
 	}
-	return res
 }
 
 func (t *KDTree[T]) Delete(value T) bool {
@@ -359,7 +357,7 @@ func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[
 	return r, ok
 }
 
-func add[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) bool {
+func insert[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) bool {
 	if value.Dist(r.value) == 0 {
 		return false
 	}
@@ -370,13 +368,13 @@ func add[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) bool {
 		if r.left == nil {
 			r.left = NewKDNode(value)
 		} else {
-			return add(d, value, ncd, r.left)
+			return insert(d, value, ncd, r.left)
 		}
 	} else {
 		if r.right == nil {
 			r.right = NewKDNode(value)
 		} else {
-			return add(d, value, ncd, r.right)
+			return insert(d, value, ncd, r.right)
 		}
 	}
 	return true

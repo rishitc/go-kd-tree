@@ -249,7 +249,7 @@ func Test2DNodeAddition1(t *testing.T) {
 	}
 	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
 	v := types.Tensor2D{48, 38}
-	tree.Add(v)
+	tree.Insert(v)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -292,7 +292,7 @@ func Test2DNodeAddition2(t *testing.T) {
 		{879, 810},
 	}
 	for _, v := range ps {
-		tree.Add(v)
+		tree.Insert(v)
 	}
 	testTable := []struct {
 		input, expected types.Tensor2D
