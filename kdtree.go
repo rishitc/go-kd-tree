@@ -358,26 +358,24 @@ func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[
 }
 
 func insert[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) bool {
-	if value.Dist(r.value) == 0 {
-		return false
-	}
-
-	ncd := (cd + 1) % d
-	rel := value.Order(r.value, cd)
-	if rel < 0 {
-		if r.left == nil {
-			r.left = NewKDNode(value)
+	for value.Dist(r.value) != 0 {
+		rel := value.Order(r.value, cd)
+		if rel < 0 {
+			if r.left == nil {
+				r.left = NewKDNode(value)
+				return true
+			}
+			r = r.left
 		} else {
-			return insert(d, value, ncd, r.left)
+			if r.right == nil {
+				r.right = NewKDNode(value)
+				return true
+			}
+			r = r.right
 		}
-	} else {
-		if r.right == nil {
-			r.right = NewKDNode(value)
-		} else {
-			return insert(d, value, ncd, r.right)
-		}
+		cd = (cd + 1) % d
 	}
-	return true
+	return false
 }
 
 func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T {
