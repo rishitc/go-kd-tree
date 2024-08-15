@@ -383,3 +383,42 @@ func Test2DTreeBalance(t *testing.T) {
 		}
 	}
 }
+
+func Test2DInsertDuplicateNode(t *testing.T) {
+	treeNodes := NewKDNode(types.Tensor2D{35, 60}).
+		SetLeft(
+			NewKDNode(types.Tensor2D{20, 45}),
+		).
+		SetRight(
+			NewKDNode(types.Tensor2D{60, 80}),
+		)
+	tree := NewTestKDTree(2, treeNodes)
+
+	expTreeNodes := treeNodes
+	testTable := []struct {
+		input    types.Tensor2D
+		expected *KDTree[types.Tensor2D]
+	}{
+		{
+			input:    types.Tensor2D{35, 60},
+			expected: NewTestKDTree(2, expTreeNodes),
+		},
+		{
+			input:    types.Tensor2D{20, 45},
+			expected: NewTestKDTree(2, expTreeNodes),
+		},
+		{
+			input:    types.Tensor2D{60, 80},
+			expected: NewTestKDTree(2, expTreeNodes),
+		},
+	}
+	for _, v := range testTable {
+		tree.Insert(v.input)
+		if tree.size != v.expected.size {
+			t.Fatalf("Tree size does not match expected tree size\nExpected:\n%d\nGot:\n%d", v.expected.size, tree.size)
+		}
+		if !IdenticalTrees(tree, v.expected) {
+			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
+		}
+	}
+}
