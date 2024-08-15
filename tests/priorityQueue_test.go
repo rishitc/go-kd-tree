@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"container/heap"
 	"testing"
+
+	heap "github.com/rishitc/go-kd-tree/internal/utils"
 
 	boundedpq "github.com/rishitc/go-kd-tree"
 	types "github.com/rishitc/go-kd-tree/internal/types"
@@ -19,9 +20,9 @@ func TestBoundedPriorityQueue(t *testing.T) {
 		{
 			name: "More number of input elements as compared to the max allowed size of the bounded priority queue",
 			inputElems: []boundedpq.Item[types.Tensor2D]{
-				{Data: types.Tensor2D{1, 2}, Priority: 3},
-				{Data: types.Tensor2D{3, 5}, Priority: 2},
-				{Data: types.Tensor2D{6, 7}, Priority: 4},
+				{Data: &types.Tensor2D{1, 2}, Priority: 3},
+				{Data: &types.Tensor2D{3, 5}, Priority: 2},
+				{Data: &types.Tensor2D{6, 7}, Priority: 4},
 			},
 			inputMaxSize: 2,
 			expLen:       2,
@@ -33,9 +34,9 @@ func TestBoundedPriorityQueue(t *testing.T) {
 		{
 			name: "Less number of input elements as compared to the max allowed size of the bounded priority queue",
 			inputElems: []boundedpq.Item[types.Tensor2D]{
-				{Data: types.Tensor2D{1, 2}, Priority: 3},
-				{Data: types.Tensor2D{3, 5}, Priority: 2},
-				{Data: types.Tensor2D{6, 7}, Priority: 4},
+				{Data: &types.Tensor2D{1, 2}, Priority: 3},
+				{Data: &types.Tensor2D{3, 5}, Priority: 2},
+				{Data: &types.Tensor2D{6, 7}, Priority: 4},
 			},
 			inputMaxSize: 5,
 			expLen:       3,
@@ -48,9 +49,9 @@ func TestBoundedPriorityQueue(t *testing.T) {
 		{
 			name: "Equal number of input elements as compared to the max allowed size of the bounded priority queue",
 			inputElems: []boundedpq.Item[types.Tensor2D]{
-				{Data: types.Tensor2D{1, 2}, Priority: 3},
-				{Data: types.Tensor2D{3, 5}, Priority: 2},
-				{Data: types.Tensor2D{6, 7}, Priority: 4},
+				{Data: &types.Tensor2D{1, 2}, Priority: 3},
+				{Data: &types.Tensor2D{3, 5}, Priority: 2},
+				{Data: &types.Tensor2D{6, 7}, Priority: 4},
 			},
 			inputMaxSize: 3,
 			expLen:       3,
@@ -63,10 +64,10 @@ func TestBoundedPriorityQueue(t *testing.T) {
 		{
 			name: "Inserting two elements with the same priority and the one inserted first should be retained",
 			inputElems: []boundedpq.Item[types.Tensor2D]{
-				{Data: types.Tensor2D{1, 2}, Priority: 2},
-				{Data: types.Tensor2D{3, 5}, Priority: 3},
-				{Data: types.Tensor2D{4, 8}, Priority: 4},
-				{Data: types.Tensor2D{6, 7}, Priority: 4},
+				{Data: &types.Tensor2D{1, 2}, Priority: 2},
+				{Data: &types.Tensor2D{3, 5}, Priority: 3},
+				{Data: &types.Tensor2D{4, 8}, Priority: 4},
+				{Data: &types.Tensor2D{6, 7}, Priority: 4},
 			},
 			inputMaxSize: 3,
 			expLen:       3,
@@ -94,7 +95,7 @@ func TestBoundedPriorityQueue(t *testing.T) {
 			}
 
 			for i := range st.expLen {
-				headElem := pq.Peek().(boundedpq.Item[types.Tensor2D]).Data
+				headElem := pq.Peek().Data
 				expElem := st.expOrderedElems[i]
 				if expElem[0] != headElem[0] && expElem[1] != headElem[1] {
 					t.Errorf("Expected next element to be %v, got %v", expElem, headElem)

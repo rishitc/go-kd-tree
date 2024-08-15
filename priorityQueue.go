@@ -1,12 +1,13 @@
 package kdtree
 
 import (
-	"container/heap"
 	"slices"
+
+	heap "github.com/rishitc/go-kd-tree/internal/utils"
 )
 
 type Item[T Comparable[T]] struct {
-	Data     T
+	Data     *T
 	Priority int
 }
 
@@ -17,7 +18,7 @@ type BoundedPriorityQueue[T Comparable[T]] struct {
 
 func NewBoundedPriorityQueue[T Comparable[T]](maxSize int) BoundedPriorityQueue[T] {
 	return BoundedPriorityQueue[T]{
-		data:     nil,
+		data:     make([]Item[T], 0, maxSize),
 		capacity: maxSize,
 	}
 }
@@ -33,8 +34,7 @@ func (pq BoundedPriorityQueue[T]) Swap(i, j int) {
 	pq.data[i], pq.data[j] = pq.data[j], pq.data[i]
 }
 
-func (pq *BoundedPriorityQueue[T]) Push(value any) {
-	item := value.(Item[T])
+func (pq *BoundedPriorityQueue[T]) Push(item Item[T]) {
 	isFull := pq.Len() == pq.capacity
 
 	if isFull {
@@ -46,14 +46,14 @@ func (pq *BoundedPriorityQueue[T]) Push(value any) {
 	pq.data = append(pq.data, item)
 }
 
-func (pq *BoundedPriorityQueue[T]) Pop() any {
+func (pq *BoundedPriorityQueue[T]) Pop() Item[T] {
 	n := pq.Len()
 	item := pq.data[n-1]
 	pq.data = slices.Delete(pq.data, n-1, n)
 	return item
 }
 
-func (pq *BoundedPriorityQueue[T]) Peek() any {
+func (pq *BoundedPriorityQueue[T]) Peek() Item[T] {
 	return pq.data[0]
 }
 

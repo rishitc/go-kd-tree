@@ -184,7 +184,7 @@ func Test2DNearestNeighbor5(t *testing.T) {
 	}
 }
 
-func tensor2DSortFunc(a, b types.Tensor2D) int {
+func tensor2DSortFunc(a, b *types.Tensor2D) int {
 	if a[0] != b[0] {
 		return a[0] - b[0]
 	} else {
@@ -210,19 +210,19 @@ func Test2DKNearestNeighbor1(t *testing.T) {
 	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
 	testTable := map[string]struct {
 		input    input
-		expected []types.Tensor2D
+		expected []*types.Tensor2D
 	}{
 		"Find the 2 closest neighbors to a point that is not in the KD tree.": {
 			input:    input{p: [2]int{25, 25}, k: 2},
-			expected: []types.Tensor2D{{40, 20}, {10, 25}},
+			expected: []*types.Tensor2D{{40, 20}, {10, 25}},
 		},
 		"The closest neighbor to a point that is in the KD tree.": {
 			input:    input{p: [2]int{60, 90}, k: 1},
-			expected: []types.Tensor2D{{60, 90}},
+			expected: []*types.Tensor2D{{60, 90}},
 		},
 		"The three closest neighbors to a point that is in the KD tree.": {
 			input:    input{p: [2]int{70, 70}, k: 3},
-			expected: []types.Tensor2D{{50, 50}, {60, 90}, {70, 70}},
+			expected: []*types.Tensor2D{{50, 50}, {60, 90}, {70, 70}},
 		},
 	}
 	for name, st := range testTable {

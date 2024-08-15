@@ -1,7 +1,6 @@
 package kdtree
 
 import (
-	"container/heap"
 	"fmt"
 	"sort"
 	"strings"
@@ -403,7 +402,7 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	return nn
 }
 
-func (t *KDTree[T]) KNearestNeighbor(value T, k int) []T {
+func (t *KDTree[T]) KNearestNeighbor(value T, k int) []*T {
 	if t == nil || t.root == nil || t.size < k {
 		return nil
 	}
@@ -411,9 +410,10 @@ func (t *KDTree[T]) KNearestNeighbor(value T, k int) []T {
 	pqRes := NewBoundedPriorityQueue[T](k)
 	kNearestNeighbor(k, t.dimensions, &value, &pqRes, 0, t.root)
 
-	res := make([]T, 0, pqRes.Len())
-	for pqRes.Len() != 0 {
-		d := heap.Pop(&pqRes).(Item[T]).Data
+	res := make([]*T, 0, k)
+	for range k {
+		// heap with a preset capacity
+		d := internal.Pop(&pqRes).Data
 		res = append(res, d)
 	}
 
@@ -459,8 +459,8 @@ func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[
 	ncd = (ncd - 1 + d) % d // Go back to the dimension used for splitting at the leaf node.
 	for path, cn, cDir := popLast(path); cn != nil; path, cn, cDir = popLast(path) {
 		currentDistance := (*v).Dist(cn.value)
-		heap.Push(pq, Item[T]{
-			Data:     cn.value,
+		internal.Push(pq, Item[T]{
+			Data:     &cn.value,
 			Priority: currentDistance,
 		})
 
@@ -478,7 +478,7 @@ func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[
 }
 
 func getFarthestDistance[T Comparable[T]](pq *BoundedPriorityQueue[T]) int {
-	v := pq.Peek().(Item[T])
+	v := pq.Peek()
 	return v.Priority
 }
 
