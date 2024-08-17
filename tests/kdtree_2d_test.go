@@ -192,7 +192,7 @@ func tensor2DSortFunc(a, b *types.Tensor2D) int {
 	}
 }
 
-func Test2DKNearestNeighbor1(t *testing.T) {
+func Test2DKNN1(t *testing.T) {
 	const dimensions = 2
 	type input struct {
 		p types.Tensor2D
@@ -227,7 +227,7 @@ func Test2DKNearestNeighbor1(t *testing.T) {
 	}
 	for name, st := range testTable {
 		t.Run(name, func(t *testing.T) {
-			nns := tree.KNearestNeighbor(st.input.p, st.input.k)
+			nns := tree.KNN(st.input.p, st.input.k)
 			slices.SortFunc(nns, tensor2DSortFunc)
 			slices.SortFunc(st.expected, tensor2DSortFunc)
 			for i := range len(st.expected) {

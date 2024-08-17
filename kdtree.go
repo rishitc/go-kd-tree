@@ -402,13 +402,13 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	return nn
 }
 
-func (t *KDTree[T]) KNearestNeighbor(value T, k int) []*T {
+func (t *KDTree[T]) KNN(value T, k int) []*T {
 	if t == nil || t.root == nil || t.size < k {
 		return nil
 	}
 
 	pqRes := NewBoundedPriorityQueue[T](k)
-	kNearestNeighbor(k, t.dimensions, &value, &pqRes, 0, t.root)
+	knn(k, t.dimensions, &value, &pqRes, 0, t.root)
 
 	res := make([]*T, 0, k)
 	for range k {
@@ -432,7 +432,7 @@ type nodeInfo[T Comparable[T]] struct {
 	dir  direction
 }
 
-func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[T], cd int, r *kdNode[T]) {
+func knn[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[T], cd int, r *kdNode[T]) {
 	if r == nil {
 		return
 	}
@@ -471,7 +471,7 @@ func kNearestNeighbor[T Comparable[T]](k, d int, v *T, pq *BoundedPriorityQueue[
 			} else {
 				next = cn.left
 			}
-			kNearestNeighbor(k, d, v, pq, (ncd+1)%d, next)
+			knn(k, d, v, pq, (ncd+1)%d, next)
 		}
 		ncd = (ncd - 1 + d) % d
 	}
