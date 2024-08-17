@@ -438,7 +438,7 @@ func Test2DFindMax2(t *testing.T) {
 	}
 }
 
-func Test2DTree_Query(t *testing.T) {
+func Test2DTree_RangeSearch(t *testing.T) {
 	const dimensions = 2
 	inputTensor2D := []types.Tensor2D{{1, 0}, {1, 8}, {2, 2}, {2, 10}, {3, 4}, {4, 1}, {5, 4}, {6, 8}, {7, 4}, {7, 7}, {8, 2}, {8, 5}, {9, 9}, {3, 6}, {4, 2}, {9, 2}, {6, 5}, {3, 8}, {6, 2}, {1, 3}, {3, 3}, {6, 4}, {9, 8}, {2, 1}, {2, 8}, {3, 1}, {7, 3}, {3, 9}, {4, 4}, {5, 3}, {9, 6}}
 	tests := []struct {
@@ -605,7 +605,7 @@ func Test2DTree_Query(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, test.tree.Query(test.input))
+			assert.Equal(t, test.expected, test.tree.RangeSearch(test.input))
 		})
 	}
 }

@@ -99,9 +99,9 @@ func (t *KDTree[T]) NearestNeighbor(value T) (T, bool) {
 	return *res, true
 }
 
-func (t *KDTree[T]) Query(getRelativePosition RangeFunc[T]) []T {
+func (t *KDTree[T]) RangeSearch(getRelativePosition RangeFunc[T]) []T {
 	var res []T
-	query(getRelativePosition, t.dimensions, &res, t.root, 0)
+	rangeSearch(getRelativePosition, t.dimensions, &res, t.root, 0)
 	return res
 }
 
@@ -222,7 +222,7 @@ func (t *KDTree[T]) Balance() {
 	t.root = NewKDTreeWithValues(t.dimensions, t.Values()).root
 }
 
-func query[T Comparable[T]](getRelativePosition RangeFunc[T], d int, res *[]T, r *kdNode[T], cd int) {
+func rangeSearch[T Comparable[T]](getRelativePosition RangeFunc[T], d int, res *[]T, r *kdNode[T], cd int) {
 	if r == nil {
 		return
 	}
@@ -235,12 +235,12 @@ func query[T Comparable[T]](getRelativePosition RangeFunc[T], d int, res *[]T, r
 	ncd := (cd + 1) % d
 	switch relInCD := getRelativePosition(r.value, cd); relInCD {
 	case BeforeRange:
-		query(getRelativePosition, d, res, r.right, ncd)
+		rangeSearch(getRelativePosition, d, res, r.right, ncd)
 	case AfterRange:
-		query(getRelativePosition, d, res, r.left, ncd)
+		rangeSearch(getRelativePosition, d, res, r.left, ncd)
 	case InRange:
-		query(getRelativePosition, d, res, r.left, ncd)
-		query(getRelativePosition, d, res, r.right, ncd)
+		rangeSearch(getRelativePosition, d, res, r.left, ncd)
+		rangeSearch(getRelativePosition, d, res, r.right, ncd)
 	default:
 		panic(fmt.Sprintf("Invalid value returned: %v", relInCD))
 	}
