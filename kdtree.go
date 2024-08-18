@@ -162,6 +162,55 @@ func (t *KDTree[T]) String() string {
 	return b.String()
 }
 
+// Implementation inspired by: https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
+func (t *KDTree[T]) Dot() string {
+	b := strings.Builder{}
+	b.WriteString("digraph BST {\n")
+
+	node := t.root
+	if node == nil {
+		b.WriteString("\n")
+	} else {
+		nodeCount := 0
+		currentNode := fmt.Sprintf("node%d", nodeCount)
+		nodeCount++
+		currNodeDef := fmt.Sprintf("    %s [label=\"%s\"]\n", currentNode, node.value.String())
+		b.WriteString(currNodeDef)
+		dot(node, &b, &nodeCount, currentNode)
+	}
+
+	b.WriteString("}\n")
+	return b.String()
+}
+
+func dot[T Comparable[T]](node *kdNode[T], b *strings.Builder, nodeCount *int, currentNode string) {
+	leftNode := fmt.Sprintf("node%d", *nodeCount)
+	*nodeCount++
+	if node.left != nil {
+		leftNodeDef := fmt.Sprintf("    %s [label=\"%s\"];\n", leftNode, node.left.value.String())
+		b.WriteString(leftNodeDef)
+		b.WriteString(fmt.Sprintf("    %s -> %s;\n", currentNode, leftNode))
+		dot(node.left, b, nodeCount, leftNode)
+	} else {
+		leftNodeDef := fmt.Sprintf("    %s [shape=point];\n", leftNode)
+		b.WriteString(leftNodeDef)
+		b.WriteString(fmt.Sprintf("    %s -> %s;\n", currentNode, leftNode))
+	}
+
+	rightNode := fmt.Sprintf("node%d", *nodeCount)
+	*nodeCount++
+	if node.right != nil {
+		rightNodeDef := fmt.Sprintf("    %s [label=\"%s\"];\n", rightNode, node.right.value.String())
+		b.WriteString(rightNodeDef)
+		b.WriteString(fmt.Sprintf("    %s -> %s;\n", currentNode, rightNode))
+		dot(node.right, b, nodeCount, rightNode)
+	} else {
+		rightNodeDef := fmt.Sprintf("    %s [shape=point];\n", rightNode)
+		b.WriteString(rightNodeDef)
+		b.WriteString(fmt.Sprintf("    %s -> %s;\n", currentNode, rightNode))
+	}
+}
+
 const encodingVersion uint32 = 0
 
 func (t *KDTree[T]) Encode() []byte {

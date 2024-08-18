@@ -609,3 +609,68 @@ func Test2DTree_RangeSearch(t *testing.T) {
 		})
 	}
 }
+
+func Test2DDot(t *testing.T) {
+	const dimensions = 2
+	tests := []struct {
+		name     string
+		input    []types.Tensor2D
+		expected string
+	}{
+		{
+			name: "Small Tree Size",
+			input: []types.Tensor2D{
+				{3, 2},
+				{5, 8},
+				{6, 1},
+				{9, 0},
+				{4, 4},
+				{1, 1},
+				{2, 2},
+				{8, 7},
+			},
+			expected: `digraph BST {
+    node0 [label="[4, 4]"]
+    node1 [label="[2, 2]"];
+    node0 -> node1;
+    node2 [label="[1, 1]"];
+    node1 -> node2;
+    node3 [shape=point];
+    node2 -> node3;
+    node4 [shape=point];
+    node2 -> node4;
+    node5 [label="[3, 2]"];
+    node1 -> node5;
+    node6 [shape=point];
+    node5 -> node6;
+    node7 [shape=point];
+    node5 -> node7;
+    node8 [label="[6, 1]"];
+    node0 -> node8;
+    node9 [label="[9, 0]"];
+    node8 -> node9;
+    node10 [shape=point];
+    node9 -> node10;
+    node11 [shape=point];
+    node9 -> node11;
+    node12 [label="[5, 8]"];
+    node8 -> node12;
+    node13 [shape=point];
+    node12 -> node13;
+    node14 [label="[8, 7]"];
+    node12 -> node14;
+    node15 [shape=point];
+    node14 -> node15;
+    node16 [shape=point];
+    node14 -> node16;
+}
+`,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tree := kdtree.NewKDTreeWithValues(dimensions, test.input)
+			assert.Equal(t, test.expected, tree.Dot())
+		})
+	}
+}
