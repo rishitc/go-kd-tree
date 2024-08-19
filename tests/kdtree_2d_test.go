@@ -9,8 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const dimensions2DCount = 2
+
 func Test2DNearestNeighbor1(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{3, 2},
 		{5, 8},
@@ -21,7 +22,7 @@ func Test2DNearestNeighbor1(t *testing.T) {
 		{2, 2},
 		{8, 7},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -63,7 +64,6 @@ func Test2DNearestNeighbor1(t *testing.T) {
 }
 
 func Test2DNearestNeighbor2(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{5, 4},
 		{3, 1},
@@ -72,7 +72,7 @@ func Test2DNearestNeighbor2(t *testing.T) {
 		{10, 2},
 		{13, 3},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -90,7 +90,6 @@ func Test2DNearestNeighbor2(t *testing.T) {
 }
 
 func Test2DNearestNeighbor3(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{207, 313},
 		{70, 721},
@@ -100,7 +99,7 @@ func Test2DNearestNeighbor3(t *testing.T) {
 		{479, 449},
 		{888, 585},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -118,7 +117,6 @@ func Test2DNearestNeighbor3(t *testing.T) {
 }
 
 func Test2DNearestNeighbor4(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{272, 59},
 		{259, 189},
@@ -141,7 +139,7 @@ func Test2DNearestNeighbor4(t *testing.T) {
 		{662, 798},
 		{879, 810},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -159,7 +157,6 @@ func Test2DNearestNeighbor4(t *testing.T) {
 }
 
 func Test2DNearestNeighbor5(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{50, 50},
 		{80, 40},
@@ -167,7 +164,7 @@ func Test2DNearestNeighbor5(t *testing.T) {
 		{51, 38},
 		{48, 38},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor2D
 	}{
@@ -193,7 +190,6 @@ func tensor2DSortFunc(a, b *types.Tensor2D) int {
 }
 
 func Test2DKNN1(t *testing.T) {
-	const dimensions = 2
 	type input struct {
 		p types.Tensor2D
 		k int
@@ -207,7 +203,7 @@ func Test2DKNN1(t *testing.T) {
 		{60, 10},
 		{60, 90},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := map[string]struct {
 		input    input
 		expected []*types.Tensor2D
@@ -240,14 +236,13 @@ func Test2DKNN1(t *testing.T) {
 }
 
 func Test2DNodeAddition1(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{50, 50},
 		{80, 40},
 		{10, 60},
 		{51, 38},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	v := types.Tensor2D{48, 38}
 	tree.Insert(v)
 	testTable := []struct {
@@ -267,8 +262,7 @@ func Test2DNodeAddition1(t *testing.T) {
 }
 
 func Test2DNodeAddition2(t *testing.T) {
-	const dimensions = 2
-	tree := kdtree.NewKDTreeWithValues(dimensions, []types.Tensor2D{})
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, []types.Tensor2D{})
 	ps := []types.Tensor2D{
 		{272, 59},
 		{259, 189},
@@ -311,7 +305,6 @@ func Test2DNodeAddition2(t *testing.T) {
 }
 
 func Test2DFindMin1(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{35, 90},
 		{60, 80},
@@ -323,7 +316,7 @@ func Test2DFindMin1(t *testing.T) {
 		{1, 10},
 		{55, 1},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input    int
 		expected types.Tensor2D
@@ -342,7 +335,6 @@ func Test2DFindMin1(t *testing.T) {
 }
 
 func Test2DFindMin2(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{35, 90},
 		{60, 80},
@@ -354,7 +346,7 @@ func Test2DFindMin2(t *testing.T) {
 		{1, 10},
 		{55, 1},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input    int
 		expected types.Tensor2D
@@ -373,7 +365,6 @@ func Test2DFindMin2(t *testing.T) {
 }
 
 func Test2DFindMax1(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{35, 90},
 		{60, 80},
@@ -385,7 +376,7 @@ func Test2DFindMax1(t *testing.T) {
 		{1, 10},
 		{55, 1},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input    int
 		expected types.Tensor2D
@@ -408,7 +399,6 @@ func Test2DFindMax1(t *testing.T) {
 }
 
 func Test2DFindMax2(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor2D{
 		{35, 90},
 		{60, 80},
@@ -420,7 +410,7 @@ func Test2DFindMax2(t *testing.T) {
 		{1, 10},
 		{55, 1},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions2DCount, ps)
 	testTable := []struct {
 		input    int
 		expected types.Tensor2D
@@ -439,7 +429,6 @@ func Test2DFindMax2(t *testing.T) {
 }
 
 func Test2DTree_RangeSearch(t *testing.T) {
-	const dimensions = 2
 	inputTensor2D := []types.Tensor2D{{1, 0}, {1, 8}, {2, 2}, {2, 10}, {3, 4}, {4, 1}, {5, 4}, {6, 8}, {7, 4}, {7, 7}, {8, 2}, {8, 5}, {9, 9}, {3, 6}, {4, 2}, {9, 2}, {6, 5}, {3, 8}, {6, 2}, {1, 3}, {3, 3}, {6, 4}, {9, 8}, {2, 1}, {2, 8}, {3, 1}, {7, 3}, {3, 9}, {4, 4}, {5, 3}, {9, 6}}
 	tests := []struct {
 		name     string
@@ -449,7 +438,7 @@ func Test2DTree_RangeSearch(t *testing.T) {
 	}{
 		{
 			name: "out of range x (lower)",
-			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			tree: kdtree.NewKDTreeWithValues(dimensions2DCount, inputTensor2D),
 			input: func(td types.Tensor2D, i int) kdtree.RelativePosition {
 				switch i {
 				case -1:
@@ -480,7 +469,7 @@ func Test2DTree_RangeSearch(t *testing.T) {
 		},
 		{
 			name: "out of range y (lower)",
-			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			tree: kdtree.NewKDTreeWithValues(dimensions2DCount, inputTensor2D),
 			input: func(td types.Tensor2D, i int) kdtree.RelativePosition {
 				switch i {
 				case -1:
@@ -511,7 +500,7 @@ func Test2DTree_RangeSearch(t *testing.T) {
 		},
 		{
 			name: "out of range x (higher)",
-			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			tree: kdtree.NewKDTreeWithValues(dimensions2DCount, inputTensor2D),
 			input: func(td types.Tensor2D, i int) kdtree.RelativePosition {
 				switch i {
 				case -1:
@@ -542,7 +531,7 @@ func Test2DTree_RangeSearch(t *testing.T) {
 		},
 		{
 			name: "out of range y (higher)",
-			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			tree: kdtree.NewKDTreeWithValues(dimensions2DCount, inputTensor2D),
 			input: func(td types.Tensor2D, i int) kdtree.RelativePosition {
 				switch i {
 				case -1:
@@ -573,7 +562,7 @@ func Test2DTree_RangeSearch(t *testing.T) {
 		},
 		{
 			name: "some values in range",
-			tree: kdtree.NewKDTreeWithValues(dimensions, inputTensor2D),
+			tree: kdtree.NewKDTreeWithValues(dimensions2DCount, inputTensor2D),
 			input: func(td types.Tensor2D, i int) kdtree.RelativePosition {
 				switch i {
 				case -1:
@@ -611,7 +600,6 @@ func Test2DTree_RangeSearch(t *testing.T) {
 }
 
 func Test2DDot(t *testing.T) {
-	const dimensions = 2
 	tests := []struct {
 		name     string
 		input    []types.Tensor2D
@@ -669,7 +657,7 @@ func Test2DDot(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			tree := kdtree.NewKDTreeWithValues(dimensions, test.input)
+			tree := kdtree.NewKDTreeWithValues(dimensions2DCount, test.input)
 			assert.Equal(t, test.expected, tree.Dot())
 		})
 	}
