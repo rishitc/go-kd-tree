@@ -8,8 +8,9 @@ import (
 	types "github.com/rishitc/go-kd-tree/internal/types"
 )
 
+const dimensions3DCount = 3
+
 func Test3DNearestNeighbor1(t *testing.T) {
-	const dimensions = 3
 	ps := []types.Tensor3D{
 		{2, 3, 3},
 		{5, 4, 2},
@@ -27,7 +28,7 @@ func Test3DNearestNeighbor1(t *testing.T) {
 		{2, 1, 3},
 		{8, 7, 6},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions3DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor3D
 	}{
@@ -45,7 +46,6 @@ func Test3DNearestNeighbor1(t *testing.T) {
 }
 
 func Test3DNearestNeighbor2(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor3D{
 		{5, 4},
 		{3, 1},
@@ -54,7 +54,7 @@ func Test3DNearestNeighbor2(t *testing.T) {
 		{10, 2},
 		{13, 3},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions3DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor3D
 	}{
@@ -72,7 +72,6 @@ func Test3DNearestNeighbor2(t *testing.T) {
 }
 
 func Test3DNearestNeighbor3(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor3D{
 		{207, 313},
 		{70, 721},
@@ -82,7 +81,7 @@ func Test3DNearestNeighbor3(t *testing.T) {
 		{479, 449},
 		{888, 585},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions3DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor3D
 	}{
@@ -100,7 +99,6 @@ func Test3DNearestNeighbor3(t *testing.T) {
 }
 
 func Test3DNearestNeighbor4(t *testing.T) {
-	const dimensions = 2
 	ps := []types.Tensor3D{
 		{272, 59},
 		{259, 189},
@@ -123,7 +121,7 @@ func Test3DNearestNeighbor4(t *testing.T) {
 		{662, 798},
 		{879, 810},
 	}
-	tree := kdtree.NewKDTreeWithValues(dimensions, ps)
+	tree := kdtree.NewKDTreeWithValues(dimensions3DCount, ps)
 	testTable := []struct {
 		input, expected types.Tensor3D
 	}{
