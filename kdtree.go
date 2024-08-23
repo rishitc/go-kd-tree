@@ -121,9 +121,9 @@ func (t *KDTree[T]) Insert(value T) {
 	}
 }
 
-func (t *KDTree[T]) Delete(value T) bool {
+func (t *KDTree[T]) Remove(value T) bool {
 	ok := false
-	t.root, ok = deleteNode(t.dimensions, value, 0, t.root)
+	t.root, ok = removeNode(t.dimensions, value, 0, t.root)
 	if ok {
 		t.size--
 	}
@@ -379,7 +379,7 @@ func insertAllNew[T Comparable[T]](vs []T, initialIndices [][]int, cd int) *kdNo
 	return n
 }
 
-func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[T], bool) {
+func removeNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[T], bool) {
 	if r == nil {
 		return nil, false
 	}
@@ -389,18 +389,18 @@ func deleteNode[T Comparable[T]](d int, value T, cd int, r *kdNode[T]) (*kdNode[
 		ok = true
 		if r.right != nil {
 			r.value = *findMin(d, cd, ncd, r.right)
-			r.right, ok = deleteNode(d, r.value, ncd, r.right)
+			r.right, ok = removeNode(d, r.value, ncd, r.right)
 		} else if r.left != nil {
 			r.value = *findMin(d, cd, ncd, r.left)
-			r.right, ok = deleteNode(d, r.value, ncd, r.left)
+			r.right, ok = removeNode(d, r.value, ncd, r.left)
 			r.left = nil
 		} else {
 			r = nil
 		}
 	} else if value.Order(r.value, cd) < 0 {
-		r.left, ok = deleteNode(d, value, ncd, r.left)
+		r.left, ok = removeNode(d, value, ncd, r.left)
 	} else {
-		r.right, ok = deleteNode(d, value, ncd, r.right)
+		r.right, ok = removeNode(d, value, ncd, r.right)
 	}
 	return r, ok
 }

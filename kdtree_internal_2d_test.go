@@ -6,7 +6,7 @@ import (
 	types "github.com/rishitc/go-kd-tree/internal/types"
 )
 
-func Test2DDeleteAllNodesInTree(t *testing.T) {
+func Test2DRemoveAllNodesInTree(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{5, 6})
 	tree := NewTestKDTree(2, treeNodes)
 
@@ -20,7 +20,7 @@ func Test2DDeleteAllNodesInTree(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
@@ -28,7 +28,7 @@ func Test2DDeleteAllNodesInTree(t *testing.T) {
 }
 
 // https://youtu.be/DkBNF98MV1Q?si=YhQLGxiH7BbG9D8s&t=37
-func Test2DDeleteLeafNode(t *testing.T) {
+func Test2DRemoveLeafNode(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{25, 50}).
 		SetLeft(
 			NewKDNode(types.Tensor2D{3, 25}),
@@ -58,7 +58,7 @@ func Test2DDeleteLeafNode(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
@@ -66,7 +66,7 @@ func Test2DDeleteLeafNode(t *testing.T) {
 }
 
 // https://youtu.be/DkBNF98MV1Q?si=-tQZZtNASyMXnhNc&t=90
-func Test2DDeleteNodeWithRightSubtree(t *testing.T) {
+func Test2DRemoveNodeWithRightSubtree(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{25, 50}).
 		SetLeft(
 			NewKDNode(types.Tensor2D{3, 25}).
@@ -108,7 +108,7 @@ func Test2DDeleteNodeWithRightSubtree(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
@@ -116,7 +116,7 @@ func Test2DDeleteNodeWithRightSubtree(t *testing.T) {
 }
 
 // https://youtu.be/DkBNF98MV1Q?si=v-TuZNV9YiTmCOFg&t=189
-func Test2DDeleteNodeWithLeftSubtreeOnly(t *testing.T) {
+func Test2DRemoveNodeWithLeftSubtreeOnly(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{25, 50}).
 		SetLeft(
 			NewKDNode(types.Tensor2D{3, 25}).
@@ -158,14 +158,14 @@ func Test2DDeleteNodeWithLeftSubtreeOnly(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
 	}
 }
 
-func Test2DDeleteNode1(t *testing.T) {
+func Test2DRemoveNode1(t *testing.T) {
 	const dimensions = 2
 	ps := []types.Tensor2D{
 		{5, 6},
@@ -185,13 +185,13 @@ func Test2DDeleteNode1(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
 	}
 }
-func Test2DDeleteNode2(t *testing.T) {
+func Test2DRemoveNode2(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{5, 6}).
 		SetLeft(
 			NewKDNode(types.Tensor2D{4, 10}).
@@ -215,7 +215,7 @@ func Test2DDeleteNode2(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
@@ -227,7 +227,7 @@ func Test2DDeleteNode2(t *testing.T) {
 // child of node (70, 20), and not the right child of node (70, 20).
 // However, the resultant tree shown in the video lecture is correct and has been used in this test case.
 // The below test case, has been created using the corrected valid KD-Tree as input
-func Test2DDeleteNode3(t *testing.T) {
+func Test2DRemoveNode3(t *testing.T) {
 	treeNodes := NewKDNode(types.Tensor2D{35, 60}).
 		SetLeft(
 			NewKDNode(types.Tensor2D{20, 45}).
@@ -293,7 +293,7 @@ func Test2DDeleteNode3(t *testing.T) {
 		},
 	}
 	for _, v := range testTable {
-		ok := tree.Delete(v.input)
+		ok := tree.Remove(v.input)
 		if !ok || !IdenticalTrees(tree, v.expected) {
 			t.Fatalf("Tree does not match expected tree structure\nExpected:\n%s\nGot:\n%s", v.expected, tree)
 		}
