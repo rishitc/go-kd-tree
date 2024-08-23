@@ -451,7 +451,7 @@ func nearestNeighbor[T Comparable[T]](d int, v, nn *T, cd int, r *kdNode[T]) *T 
 	return nn
 }
 
-func (t *KDTree[T]) KNN(value T, k int) []*T {
+func (t *KDTree[T]) KNN(value T, k int) []T {
 	if t == nil || t.root == nil || t.size < k {
 		return nil
 	}
@@ -459,10 +459,10 @@ func (t *KDTree[T]) KNN(value T, k int) []*T {
 	pqRes := NewBoundedPriorityQueue[T](k)
 	knn(k, t.dimensions, &value, &pqRes, 0, t.root)
 
-	res := make([]*T, 0, k)
+	res := make([]T, 0, k)
 	for range k {
 		// heap with a preset capacity
-		d := internal.Pop(&pqRes).Data
+		d := *internal.Pop(&pqRes).Data
 		res = append(res, d)
 	}
 
