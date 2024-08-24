@@ -3,8 +3,6 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-
-	"golang.org/x/exp/rand"
 )
 
 type Tensor2D [2]int
@@ -60,14 +58,4 @@ func DecodeTensor2D(bytes []byte) Tensor2D {
 		panic(msg)
 	}
 	return v
-}
-
-func GenerateRandomTensor2DSlice(n int) []Tensor2D {
-	arrays := make([]Tensor2D, n)
-	r := rand.New(rand.NewSource(43))
-	for i := range arrays {
-		array := Tensor2D{r.Int(), r.Int()}
-		arrays[i] = array
-	}
-	return arrays
 }

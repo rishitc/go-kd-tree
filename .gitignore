@@ -58,3 +58,9 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/go,macos
+
+# Ignore generated benchmarking dataset files
+benchmarks/dataset/*.csv
+
+# Ignore pkg folder and its contents
+/pkg/*
