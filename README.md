@@ -1,6 +1,9 @@
 # K-D Tree
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/rishitc/go-kd-tree.svg)](https://pkg.go.dev/github.com/rishitc/go-kd-tree)
+
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+
 [![HitCount](https://hits.dwyl.com/rishitc/go-kd-tree.svg)](https://hits.dwyl.com/rishitc/go-kd-tree)
 
 [![Tests](https://github.com/rishitc/go-kd-tree/actions/workflows/run-go-tests.yml/badge.svg?branch=main)](https://github.com/rishitc/go-kd-tree/actions/workflows/run-go-tests.yml)
